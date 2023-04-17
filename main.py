@@ -28,12 +28,14 @@ submit_button.click()
 # We need to do a bit of a pause because the form submit is asynchronous.
 title = driver.title
 WebDriverWait(driver, timeout=10).until(lambda driver : title != driver.title)
-WebDriverWait(driver, timeout=10).until(lambda driver : driver.execute_script("return document.title"))
+WebDriverWait(driver, timeout=10).until(lambda driver : driver.find_element(by=By.XPATH, value="//button[text() = 'Daily']"))
+driver.find_element(by=By.XPATH, value="//button[text() = 'Daily']").click()
 logging.info("Loaded page - %s" % driver.title)
 
-WebDriverWait(driver, timeout=10).until(lambda driver : driver.find_element(by=By.LINK_TEXT, value="View Usage"))
-view_usage = driver.find_element(by=By.LINK_TEXT, value="View Usage")
+WebDriverWait(driver, timeout=10).until(lambda driver : driver.find_element(by=By.XPATH, value="//input[@placeholder = 'End Date']"))
+end_date = driver.find_element(by=By.XPATH, value="//input[@placeholder = 'End Date']")
 logging.info("Loaded page - %s" % driver.title)
+print(end_date.get_attribute("value"))
 
 """text_box = driver.find_element(by=By.NAME, value="my-text")
 submit_button = driver.find_element(by=By.CSS_SELECTOR, value="button")
