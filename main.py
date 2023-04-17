@@ -8,16 +8,8 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logging.info("Setting up web driver and opening COS page")
 driver = webdriver.Chrome()
-driver.get(config.COS_UTILITY_WEBSITE)
+driver.get(config.COS_UTILITY_USAGE_SITE)
 
-WebDriverWait(driver, timeout=10).until(lambda driver : driver.execute_script("return document.title"))
-logging.info("Loaded page - %s" % driver.title)
-
-logging.info("Finding login button")
-log_in_button = driver.find_element(by=By.XPATH, value="//button[contains(text(), '%s')]" % config.COS_UTILITY_LOGIN_TEXT)
-
-logging.info("Clicking login button")
-log_in_button.click()
 WebDriverWait(driver, timeout=10).until(lambda driver : driver.execute_script("return document.title"))
 logging.info("Loaded page - %s" % driver.title)
 
