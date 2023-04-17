@@ -1,3 +1,4 @@
+from getpass import getpass
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
@@ -13,17 +14,33 @@ WebDriverWait(driver, timeout=10).until(lambda driver : driver.execute_script("r
 logging.info("Loaded page - %s" % driver.title)
 
 logging.info("Finding login button")
-app_buttons = driver.find_elements(by=By.CLASS_NAME, value="btn-app")
-log_in_button = None
-for button in app_buttons:
-    if str.find(button.text, config.COS_UTILITY_LOGIN_TEXT) != -1:
-        log_in_button = button
-        break
-assert log_in_button
+log_in_button = driver.find_element(by=By.XPATH, value="//button[contains(text(), '%s')]" % config.COS_UTILITY_LOGIN_TEXT)
 
 logging.info("Clicking login button")
 log_in_button.click()
 WebDriverWait(driver, timeout=10).until(lambda driver : driver.execute_script("return document.title"))
+logging.info("Loaded page - %s" % driver.title)
+
+print("Please log in to your City of Seattle Account")
+username = str(input("Username: "))
+password = str(getpass("Password: "))
+
+user_textbox = driver.find_element(by=By.NAME, value="userName")
+pass_textbox = driver.find_element(by=By.NAME, value="password")
+user_textbox.send_keys(username)
+pass_textbox.send_keys(password)
+print("Logging in...")
+submit_button = driver.find_element(by=By.CSS_SELECTOR, value="button")
+submit_button.click()
+
+# We need to do a bit of a pause because the form submit is asynchronous.
+title = driver.title
+WebDriverWait(driver, timeout=10).until(lambda driver : title != driver.title)
+WebDriverWait(driver, timeout=10).until(lambda driver : driver.execute_script("return document.title"))
+logging.info("Loaded page - %s" % driver.title)
+
+WebDriverWait(driver, timeout=10).until(lambda driver : driver.find_element(by=By.LINK_TEXT, value="View Usage"))
+view_usage = driver.find_element(by=By.LINK_TEXT, value="View Usage")
 logging.info("Loaded page - %s" % driver.title)
 
 """text_box = driver.find_element(by=By.NAME, value="my-text")
