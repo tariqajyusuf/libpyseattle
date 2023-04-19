@@ -37,12 +37,13 @@ class SeattleCityLight:
         self._driver.quit()
         self._download_directory.cleanup()
 
-    def get_usage(self, username: str, password: str):
-        """Get the energy usage of the specified user over the past 30 days.
+    def get_recent_usage(self, username: str, password: str, window: int = 30):
+        """Get the energy usage of the specified user over the past n days.
 
         Args:
             username (str): City of Seattle SSO username
             password (str): City of Seattle SSO password
+            window (int): The number of days to look back. Defaults to 30.
 
         Returns:
             dict[date, float]: A dictionary with usage records.
@@ -85,7 +86,7 @@ class SeattleCityLight:
         end_date.send_keys((date.today() - datetime.timedelta(days=1)
                             ).strftime("%m-%d-%Y"))
         start_date.clear()
-        start_date.send_keys((date.today() - datetime.timedelta(days=30)
+        start_date.send_keys((date.today() - datetime.timedelta(days=window)
                               ).strftime("%m-%d-%Y"))
         WebDriverWait(self._driver, timeout=10).until(
             lambda driver: end_date.get_attribute("value") != old_value)

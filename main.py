@@ -12,7 +12,7 @@ def main():
     password = str(getpass("Password: "))
 
     utility = scl.SeattleCityLight()
-    usage = utility.get_usage(username, password)
+    usage = utility.get_recent_usage(username, password)
     print("Date\tkWh")
     for day, consumption in usage.items():
         print(f"{day}\t{consumption}")
