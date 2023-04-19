@@ -34,7 +34,7 @@ class SeattleCityLight:
         self._driver.quit()
         self._download_directory.cleanup()
 
-    def get_usage(self, username, password):
+    def get_usage(self, username: str, password: str):
         """Get the energy usage of the specified user.
 
         Args:
