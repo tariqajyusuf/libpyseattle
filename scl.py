@@ -1,11 +1,14 @@
 """Utility module to retrieve data from Seattle City Light."""
 
+import csv
 import datetime
 from datetime import date
 import glob
 import logging
 import os
 import tempfile
+
+from dateutil.parser import parse
 
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
@@ -35,14 +38,14 @@ class SeattleCityLight:
         self._download_directory.cleanup()
 
     def get_usage(self, username: str, password: str):
-        """Get the energy usage of the specified user.
+        """Get the energy usage of the specified user over the past 30 days.
 
         Args:
             username (str): City of Seattle SSO username
             password (str): City of Seattle SSO password
 
         Returns:
-            str: The downloaded CSV from the user's Seattle City Light account.
+            dict[date, float]: A dictionary with usage records.
         """
         logging.info("Logging in...")
         self._driver.get(config.COS_UTILITY_USAGE_SITE)
@@ -100,9 +103,20 @@ class SeattleCityLight:
             lambda driver: glob.glob(expected_file_glob))
 
         logging.info("Data downloaded\n")
-        usage = open(
+        usage: dict[date, float] = {}
+        with open(
             glob.glob(expected_file_glob)[0], "r", encoding='ascii'
-        ).read()
+        ) as csvfile:
+            reader = csv.DictReader(
+                csvfile, delimiter=',', fieldnames=config.COS_CSV_SCHEMA)
+
+            # Skip two lines because there are special headers.
+            next(reader)
+            next(reader)
+
+            for row in reader:
+                day = parse(row[config.COS_CSV_DATE_HEADER]).date()
+                usage[day] = float(row[config.COS_CSV_CONSUMPTION_HEADER])
         os.remove(glob.glob(expected_file_glob)[0])
 
         return usage
