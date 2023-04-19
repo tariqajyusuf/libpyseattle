@@ -1,18 +1,24 @@
+"""Utility module to retrieve data from Seattle City Light."""
+
 import datetime
 from datetime import date
-from getpass import getpass
 import glob
+import logging
 import os
+import tempfile
+
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
-import tempfile
+
 import config
-import logging
 
 
 class SeattleCityLight:
+    """A helper class to connect and download usage data from Seattle City Light."""
+
     def __init__(self):
+        """Set up the necessary selenium components for accessing SCL."""
         logging.info("Setting up web driver")
         self._download_directory = tempfile.TemporaryDirectory()
         chrome_options = webdriver.ChromeOptions()
@@ -23,10 +29,21 @@ class SeattleCityLight:
         self._driver = webdriver.Chrome(options=chrome_options)
 
     def __del__(self):
+        """Clean up driver and temporary files."""
         logging.info("Cleaning up")
         self._driver.quit()
+        self._download_directory.cleanup()
 
-    def GetUsage(self, username, password):
+    def get_usage(self, username, password):
+        """Get the energy usage of the specified user.
+
+        Args:
+            username (str): City of Seattle SSO username
+            password (str): City of Seattle SSO password
+
+        Returns:
+            str: The downloaded CSV from the user's Seattle City Light account.
+        """
         logging.info("Logging in...")
         self._driver.get(config.COS_UTILITY_USAGE_SITE)
         WebDriverWait(self._driver, timeout=10).until(
@@ -40,17 +57,19 @@ class SeattleCityLight:
             by=By.CSS_SELECTOR, value="button")
         submit_button.click()
 
-        # We need to do a bit of a pause because the form submit is asynchronous.
+        # Form submits asynchronously so we need to wait.
         title = self._driver.title
         WebDriverWait(self._driver, timeout=10).until(
             lambda driver: title != driver.title)
-        WebDriverWait(self._driver, timeout=10).until(lambda driver: driver.find_element(
-            by=By.XPATH, value="//button[text() = 'Daily']"))
+        WebDriverWait(self._driver, timeout=10).until(
+            lambda driver: driver.find_element(
+                by=By.XPATH, value="//button[text() = 'Daily']"))
         self._driver.find_element(
             by=By.XPATH, value="//button[text() = 'Daily']").click()
 
-        WebDriverWait(self._driver, timeout=10).until(lambda driver: driver.find_element(
-            by=By.CLASS_NAME, value="fusioncharts-container"))
+        WebDriverWait(self._driver, timeout=10).until(
+            lambda driver: driver.find_element(
+                by=By.CLASS_NAME, value="fusioncharts-container"))
         end_date = self._driver.find_element(
             by=By.XPATH, value="//input[@placeholder = 'End Date']")
         start_date = self._driver.find_element(
@@ -74,14 +93,15 @@ class SeattleCityLight:
                                                value="fusioncharts-container"))
 
         logging.info("Downloading data")
-        expected_file_glob = self._download_directory.name + os.path.sep + "*.csv"
+        expected_file_glob = self._download_directory.name + os.path.sep \
+            + "*.csv"
         self._driver.find_element(by=By.LINK_TEXT, value="Download").click()
         WebDriverWait(self._driver, timeout=10).until(
             lambda driver: glob.glob(expected_file_glob))
 
         logging.info("Data downloaded\n")
         usage = open(
-            glob.glob(expected_file_glob)[0], "r"
+            glob.glob(expected_file_glob)[0], "r", encoding='ascii'
         ).read()
         os.remove(glob.glob(expected_file_glob)[0])
 

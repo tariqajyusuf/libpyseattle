@@ -1,9 +1,14 @@
-import scl
+"""A command line interface to access and download Seattle City Light usage."""
+
 from getpass import getpass
 
-print("Please log in to your City of Seattle Account")
-username = str(input("Username: "))
-password = str(getpass("Password: "))
+import scl
 
-scl = scl.SeattleCityLight()
-print(scl.GetUsage(username, password))
+
+def __main__():
+    print("Please log in to your City of Seattle Account")
+    username = str(input("Username: "))
+    password = str(getpass("Password: "))
+
+    utility = scl.SeattleCityLight()
+    print(utility.get_usage(username, password))
