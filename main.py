@@ -1,29 +1,36 @@
 import datetime
 from datetime import date
 from getpass import getpass
+import glob
+import os
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
+import tempfile
 import config
 import logging
-
-logging.basicConfig(level=logging.INFO)
-logging.info("Setting up web driver and opening COS page")
-driver = webdriver.Chrome()
-driver.get(config.COS_UTILITY_USAGE_SITE)
-
-WebDriverWait(driver, timeout=10).until(lambda driver : driver.execute_script("return document.title"))
-logging.info("Loaded page - %s" % driver.title)
 
 print("Please log in to your City of Seattle Account")
 username = str(input("Username: "))
 password = str(getpass("Password: "))
 
+logging.info("Setting up web driver")
+download_directory = tempfile.TemporaryDirectory()
+chrome_options = webdriver.ChromeOptions()
+chrome_options.experimental_options["prefs"] = {
+    'profile.default_content_settings.popups': 0,
+    'download.default_directory': download_directory.name
+}
+driver = webdriver.Chrome(options=chrome_options)
+
+print("Logging in...")
+driver.get(config.COS_UTILITY_USAGE_SITE)
+WebDriverWait(driver, timeout=10).until(lambda driver : driver.execute_script("return document.title"))
+
 user_textbox = driver.find_element(by=By.NAME, value="userName")
 pass_textbox = driver.find_element(by=By.NAME, value="password")
 user_textbox.send_keys(username)
 pass_textbox.send_keys(password)
-print("Logging in...")
 submit_button = driver.find_element(by=By.CSS_SELECTOR, value="button")
 submit_button.click()
 
@@ -32,13 +39,11 @@ title = driver.title
 WebDriverWait(driver, timeout=10).until(lambda driver : title != driver.title)
 WebDriverWait(driver, timeout=10).until(lambda driver : driver.find_element(by=By.XPATH, value="//button[text() = 'Daily']"))
 driver.find_element(by=By.XPATH, value="//button[text() = 'Daily']").click()
-logging.info("Loaded page - %s" % driver.title)
 
 WebDriverWait(driver, timeout=10).until(lambda driver : driver.find_element(by=By.CLASS_NAME, value="fusioncharts-container"))
 end_date = driver.find_element(by=By.XPATH, value="//input[@placeholder = 'End Date']")
 start_date = driver.find_element(by=By.XPATH, value="//input[@placeholder = 'Start Date']")
-logging.info("Loaded page - %s" % driver.title)
-logging.info("Getting energy usage from the last 30 days")
+print("Getting energy usage from the last 30 days")
 
 # The city only provides data on a daily basis, so today's energy won't be available.
 old_value = end_date.get_attribute("value")
@@ -48,16 +53,15 @@ start_date.clear()
 start_date.send_keys((date.today() - datetime.timedelta(days=30)).strftime("%m-%d-%Y"))
 WebDriverWait(driver, timeout=10).until(lambda driver : end_date.get_attribute("value") != old_value)
 driver.find_element(by=By.XPATH, value="//button[text() = 'Update']").click()
-WebDriverWait(driver, timeout=10).until(lambda driver : driver.find_element(by=By.XPATH, value="fusioncharts-container"))
+WebDriverWait(driver, timeout=10).until(lambda driver : driver.find_element(by=By.CLASS_NAME, value="fusioncharts-container"))
 
-"""text_box = driver.find_element(by=By.NAME, value="my-text")
-submit_button = driver.find_element(by=By.CSS_SELECTOR, value="button")
-text_box.send_keys("Selenium")
-submit_button.click()
+print("Downloading data")
+driver.find_element(by=By.LINK_TEXT, value="Download").click()
+print(download_directory.name + os.path.sep + "*.xls")
+WebDriverWait(driver, timeout=10).until(lambda driver: glob.glob(download_directory.name + os.path.sep + "*.csv"))
 
-message = driver.find_element(by=By.ID, value="message")
-value = message.text
-print(value)"""
+print("Data downloaded\n")
+print(open(glob.glob(download_directory.name + os.path.sep + "*.csv")[0], "r").read())
 
-logging.info("Cleaning up webdriver")
+logging.info("Cleaning up")
 driver.quit()
