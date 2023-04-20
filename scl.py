@@ -30,6 +30,7 @@ class SeattleCityLight:
             'download.default_directory': self._download_directory.name
         }
         self._driver = webdriver.Chrome(options=chrome_options)
+        self._authenticated = False
 
     def __del__(self):
         """Clean up driver and temporary files."""
@@ -37,21 +38,20 @@ class SeattleCityLight:
         self._driver.quit()
         self._download_directory.cleanup()
 
-    def get_recent_usage(self, username: str, password: str, window: int = 30):
-        """Get the energy usage of the specified user over the past n days.
+    def authenticate(self, username: str, password: str) -> bool:
+        """Authenticates the user with the provided credentials.
 
         Args:
-            username (str): City of Seattle SSO username
-            password (str): City of Seattle SSO password
-            window (int): The number of days to look back. Defaults to 30.
+            username (str): City of Seattle user name.
+            password (str): City of Seattle password.
 
         Returns:
-            dict[date, float]: A dictionary with usage records.
+            bool: Whether the authentication was successful.
         """
         logging.info("Logging in...")
         self._driver.get(config.COS_UTILITY_USAGE_SITE)
         WebDriverWait(self._driver, timeout=10).until(
-            lambda driver: driver.execute_script("return document.title"))
+            lambda driver: driver.find_element(by=By.NAME, value="userName"))
 
         user_textbox = self._driver.find_element(by=By.NAME, value="userName")
         pass_textbox = self._driver.find_element(by=By.NAME, value="password")
@@ -62,9 +62,21 @@ class SeattleCityLight:
         submit_button.click()
 
         # Form submits asynchronously so we need to wait.
-        title = self._driver.title
         WebDriverWait(self._driver, timeout=10).until(
-            lambda driver: title != driver.title)
+            lambda driver: config.COS_UTILITY_LOGIN_SUCCESS_TITLE in driver.title)
+        self._authenticated = True
+        return self._authenticated
+
+    def get_recent_usage(self, window: int = 30):
+        """Get the energy usage of the specified user over the past n days.
+
+        Args:
+            window (int): The number of days to look back. Defaults to 30.
+
+        Returns:
+            dict[date, float]: A dictionary with usage records.
+        """
+        self._driver.get(config.COS_UTILITY_USAGE_SITE)
         WebDriverWait(self._driver, timeout=10).until(
             lambda driver: driver.find_element(
                 by=By.XPATH, value="//button[text() = 'Daily']"))

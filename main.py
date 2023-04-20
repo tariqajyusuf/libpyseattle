@@ -8,11 +8,14 @@ import scl
 def main():
     """Prompt for Seattle City Light login and print the last 30 days of consumption."""
     print("Please log in to your City of Seattle Account")
-    username = str(input("Username: "))
-    password = str(getpass("Password: "))
-
     utility = scl.SeattleCityLight()
-    usage = utility.get_recent_usage(username, password)
+    while True:
+        username = str(input("Username: "))
+        password = str(getpass("Password: "))
+        if utility.authenticate(username, password):
+            break
+
+    usage = utility.get_recent_usage()
     print("Date\tkWh")
     for day, consumption in usage.items():
         print(f"{day}\t{consumption}")
