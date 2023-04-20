@@ -11,6 +11,7 @@ import tempfile
 from dateutil.parser import parse
 
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
 
@@ -64,9 +65,14 @@ class SeattleCityLight:
         submit_button.click()
 
         # Form submits asynchronously so we need to wait.
-        WebDriverWait(self._driver, timeout=10).until(
-            lambda driver: config.COS_UTILITY_LOGIN_SUCCESS_TITLE in driver.title)
-        self._authenticated = True
+        try:
+            WebDriverWait(self._driver, timeout=10).until(
+                lambda driver: config.COS_UTILITY_LOGIN_SUCCESS_TITLE in driver.title)
+            self._authenticated = True
+        except NoSuchElementException:
+            print(self._driver.find_element(
+                by=By.CLASS_NAME, value=config.COS_UTILITY_LOGIN_ALERT).text)
+            self._authenticated = False
         return self._authenticated
 
     def get_recent_usage(self, window: int = 30):

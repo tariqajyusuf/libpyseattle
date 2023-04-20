@@ -5,6 +5,7 @@ COS_UTILITY_LOGIN_SUCCESS_TITLE = "City of Seattle Utility Services"
 COS_UTILITY_LOGIN_TEXT = "Log In"
 COS_UTILITY_LOGIN_USERNAME = "userName"
 COS_UTILITY_LOGIN_PASSWORD = "password"
+COS_UTILITY_LOGIN_ALERT = "notification-box-paragraph"
 
 # City of Seattle Utility Website, this is where you log in to see your account.
 COS_UTILITY_USAGE_SITE = "https://myutilities.seattle.gov/eportal/#/usage"
