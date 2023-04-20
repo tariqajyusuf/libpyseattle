@@ -19,7 +19,7 @@ import config
 
 
 class SeattleCityLight:
-    """A helper class to connect and download usage data from Seattle City Light."""
+    """A helper class to download usage data from Seattle City Light."""
 
     def __init__(self):
         """Set up the necessary selenium components for accessing SCL."""
@@ -52,7 +52,9 @@ class SeattleCityLight:
         logging.info("Logging in...")
         self._driver.get(config.COS_UTILITY_USAGE_SITE)
         WebDriverWait(self._driver, timeout=10).until(
-            lambda driver: driver.find_element(by=By.NAME, value=config.COS_UTILITY_LOGIN_USERNAME))
+            lambda driver: driver.find_element(
+                by=By.NAME,
+                value=config.COS_UTILITY_LOGIN_USERNAME))
 
         user_textbox = self._driver.find_element(
             by=By.NAME, value=config.COS_UTILITY_LOGIN_USERNAME)
