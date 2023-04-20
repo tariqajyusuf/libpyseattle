@@ -40,7 +40,7 @@ class SeattleCityLight:
         self._download_directory.cleanup()
 
     def authenticate(self, username: str, password: str) -> bool:
-        """Authenticates the user with the provided credentials.
+        """Authenticate the user with the provided credentials.
 
         Args:
             username (str): City of Seattle user name.
