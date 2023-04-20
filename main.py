@@ -15,8 +15,13 @@ def main():
         if utility.authenticate(username, password):
             break
 
-    usage = utility.get_recent_usage()
+    usage = utility.get_recent_usage(window=1)
     print("Date\tkWh")
+    for day, consumption in usage.items():
+        print(f"{day}\t{consumption}")
+
+    usage = utility.get_recent_usage(window=5)
+    print("\n\nDate\tkWh")
     for day, consumption in usage.items():
         print(f"{day}\t{consumption}")
 

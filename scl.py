@@ -84,8 +84,7 @@ class SeattleCityLight:
         Returns:
             dict[date, float]: A dictionary with usage records.
         """
-        if self._driver.current_url != config.COS_UTILITY_USAGE_SITE:
-            self._driver.get(config.COS_UTILITY_USAGE_SITE)
+        self._driver.get(config.COS_UTILITY_USAGE_SITE)
         WebDriverWait(self._driver, timeout=10).until(
             lambda driver: driver.find_element(
                 by=By.XPATH, value=config.COS_UTILITY_USAGE_DAILY))
