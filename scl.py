@@ -51,10 +51,12 @@ class SeattleCityLight:
         logging.info("Logging in...")
         self._driver.get(config.COS_UTILITY_USAGE_SITE)
         WebDriverWait(self._driver, timeout=10).until(
-            lambda driver: driver.find_element(by=By.NAME, value="userName"))
+            lambda driver: driver.find_element(by=By.NAME, value=config.COS_UTILITY_LOGIN_USERNAME))
 
-        user_textbox = self._driver.find_element(by=By.NAME, value="userName")
-        pass_textbox = self._driver.find_element(by=By.NAME, value="password")
+        user_textbox = self._driver.find_element(
+            by=By.NAME, value=config.COS_UTILITY_LOGIN_USERNAME)
+        pass_textbox = self._driver.find_element(
+            by=By.NAME, value=config.COS_UTILITY_LOGIN_PASSWORD)
         user_textbox.send_keys(username)
         pass_textbox.send_keys(password)
         submit_button = self._driver.find_element(
@@ -76,20 +78,21 @@ class SeattleCityLight:
         Returns:
             dict[date, float]: A dictionary with usage records.
         """
-        self._driver.get(config.COS_UTILITY_USAGE_SITE)
+        if self._driver.current_url != config.COS_UTILITY_USAGE_SITE:
+            self._driver.get(config.COS_UTILITY_USAGE_SITE)
         WebDriverWait(self._driver, timeout=10).until(
             lambda driver: driver.find_element(
-                by=By.XPATH, value="//button[text() = 'Daily']"))
+                by=By.XPATH, value=config.COS_UTILITY_USAGE_DAILY))
         self._driver.find_element(
-            by=By.XPATH, value="//button[text() = 'Daily']").click()
+            by=By.XPATH, value=config.COS_UTILITY_USAGE_DAILY).click()
 
         WebDriverWait(self._driver, timeout=10).until(
             lambda driver: driver.find_element(
-                by=By.CLASS_NAME, value="fusioncharts-container"))
+                by=By.CLASS_NAME, value=config.COS_UTILITY_USAGE_GRAPH))
         end_date = self._driver.find_element(
-            by=By.XPATH, value="//input[@placeholder = 'End Date']")
+            by=By.XPATH, value=config.COS_UTILITY_USAGE_END_DATE)
         start_date = self._driver.find_element(
-            by=By.XPATH, value="//input[@placeholder = 'Start Date']")
+            by=By.XPATH, value=config.COS_UTILITY_USAGE_START_DATE)
         logging.info("Getting energy usage from the last 30 days")
 
         # The city only provides data on a daily basis except today.
