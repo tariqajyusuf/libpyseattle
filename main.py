@@ -2,17 +2,19 @@
 
 from getpass import getpass
 
+from seattle import api
 from seattle.citylight.usage import SeattleCityLight
 
 
 def main():
     """Prompt for Seattle City Light login and print the last 30 days of consumption."""
     print("Please log in to your City of Seattle Account")
-    utility = SeattleCityLight()
+    seattle_api = api.API()
+    utility = SeattleCityLight(seattle_api)
     while True:
-        username = str(input("Username: "))
-        password = str(getpass("Password: "))
-        if utility.authenticate(username, password):
+        seattle_api.username = str(input("Username: "))
+        seattle_api.password = str(getpass("Password: "))
+        if seattle_api.get_authenticated():
             break
 
     usage = utility.get_recent_usage(window=1)
