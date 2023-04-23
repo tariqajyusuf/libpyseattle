@@ -2,13 +2,13 @@
 
 from getpass import getpass
 
-import scl
+from seattlecitylight.usage import SeattleCityLight
 
 
 def main():
     """Prompt for Seattle City Light login and print the last 30 days of consumption."""
     print("Please log in to your City of Seattle Account")
-    utility = scl.SeattleCityLight()
+    utility = SeattleCityLight()
     while True:
         username = str(input("Username: "))
         password = str(getpass("Password: "))
