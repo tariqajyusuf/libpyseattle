@@ -1,12 +1,17 @@
-# Seattle City Light Integration for Home Assistant
+# Python-based Seattle Data Library
 
-A Selenium-powered integration with Home Assistant that connects to your Seattle
-City Light usage history. This is not an official Seattle City Light
-integration.
+A data framework for accessing City of Seattle data programatically. This
+primarily focuses on accessing utility and other individual data. This is not
+officially endorsed by the City of Seattle.
+
+# Current Features
+
+- Seattle City Light
+  - Retrieve usage information in kWH.
 
 # Requirements
 
-* Python 3.10+
+- Python 3.10+
 
 # Setup Instructions
 
