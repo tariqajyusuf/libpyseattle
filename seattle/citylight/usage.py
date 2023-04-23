@@ -15,7 +15,8 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
 
-from seattlecitylight import config
+import seattle.config
+from seattle.citylight import config
 
 
 class SeattleCityLight:
@@ -54,12 +55,12 @@ class SeattleCityLight:
         WebDriverWait(self._driver, timeout=10).until(
             lambda driver: driver.find_element(
                 by=By.NAME,
-                value=config.COS_UTILITY_LOGIN_USERNAME))
+                value=seattle.config.COS_LOGIN_USERNAME))
 
         user_textbox = self._driver.find_element(
-            by=By.NAME, value=config.COS_UTILITY_LOGIN_USERNAME)
+            by=By.NAME, value=seattle.config.COS_LOGIN_USERNAME)
         pass_textbox = self._driver.find_element(
-            by=By.NAME, value=config.COS_UTILITY_LOGIN_PASSWORD)
+            by=By.NAME, value=seattle.config.COS_LOGIN_PASSWORD)
         user_textbox.send_keys(username)
         pass_textbox.send_keys(password)
         submit_button = self._driver.find_element(
@@ -69,11 +70,11 @@ class SeattleCityLight:
         # Form submits asynchronously so we need to wait.
         try:
             WebDriverWait(self._driver, timeout=10).until(
-                lambda driver: config.COS_UTILITY_LOGIN_SUCCESS_TITLE in driver.title)
+                lambda driver: seattle.config.COS_LOGIN_SUCCESS_TITLE in driver.title)
             self._authenticated = True
         except NoSuchElementException:
             print(self._driver.find_element(
-                by=By.CLASS_NAME, value=config.COS_UTILITY_LOGIN_ALERT).text)
+                by=By.CLASS_NAME, value=seattle.config.COS_LOGIN_ALERT).text)
             self._authenticated = False
         return self._authenticated
 

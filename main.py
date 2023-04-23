@@ -2,7 +2,7 @@
 
 from getpass import getpass
 
-from seattlecitylight.usage import SeattleCityLight
+from seattle.citylight.usage import SeattleCityLight
 
 
 def main():
