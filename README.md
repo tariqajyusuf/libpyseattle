@@ -6,19 +6,20 @@ officially endorsed by the City of Seattle.
 
 # Current Features
 
+- Login
+  - Supports web-based authentication and session preservation.
 - Seattle City Light
   - Retrieve usage information in kWH.
 
 # Requirements
 
 - Python 3.10+
+- [Poetry](https://python-poetry.org)
 
 # Setup Instructions
 
 ```py
-python -m venv .venv
-.venv/Scripts/activate
-pip install -r requirements.txt
+poetry install
 ```
 
 # Running
@@ -28,5 +29,5 @@ and pulls the last 30 days of data. Your username and password is sent directly
 to the city website and not stored or logged anywhere.
 
 ```py
-python -m main
+poetry run python -m libpyseattle
 ```
