@@ -1,4 +1,0 @@
--r requirements.txt
-
-autopep8>=2.0.2
-pydocstyle>=6.3.0

@@ -12,8 +12,8 @@ from dateutil.parser import parse
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
 
-from seattle import api
-from seattle.citylight import config
+from libpyseattle.sso import api
+from libpyseattle.citylight import config
 
 
 class SeattleCityLight:

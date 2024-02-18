@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "libpyseattle"
+version = "0.1.0"
+description = "Python library to access individual Seattle data"
+authors = ["Tariq Yusuf <tariq@tariqyusuf.in>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+selenium = "^4.8.2"
+webdriver-manager = "^3.8.6"
+python-dateutil = "^2.8.2"
+
+[tool.poetry.group.dev.dependencies]
+autopep8 = "^2.0.2"
+pydocstyle = "^6.3.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
